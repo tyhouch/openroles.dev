@@ -1,0 +1,148 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Observatory Design System */
+@theme inline {
+  /* Colors */
+  --color-void: #0a0a12;
+  --color-deep: #0d0d1a;
+  --color-navy: #1a1a2e;
+  --color-gold: #c9a227;
+  --color-gold-muted: rgba(201, 162, 39, 0.15);
+  --color-gold-border: rgba(201, 162, 39, 0.3);
+  --color-blue: #4a6fa5;
+  --color-blue-muted: rgba(74, 111, 165, 0.3);
+  --color-cream: #e8e4dc;
+  --color-cream-muted: #9a9aaa;
+  --color-cream-dim: #6a6a7a;
+  --color-border: #2a2a4a;
+  --color-card-bg: rgba(26, 26, 46, 0.6);
+  --color-success: #4ade80;
+  --color-danger: #f87171;
+
+  /* Semantic mappings */
+  --color-background: var(--color-void);
+  --color-foreground: var(--color-cream);
+  --color-muted: var(--color-cream-muted);
+  --color-muted-foreground: var(--color-cream-dim);
+  --color-primary: var(--color-gold);
+  --color-secondary: var(--color-blue);
+  --color-accent: var(--color-gold);
+  --color-card: var(--color-card-bg);
+
+  /* Fonts */
+  --font-sans: var(--font-dm-sans);
+  --font-serif: var(--font-cormorant);
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+}
+
+:root {
+  --radius: 0.5rem;
+}
+
+/* Animations */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slide-out-right {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-twinkle {
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold 2s infinite;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease forwards;
+}
+
+.animate-slide-out-right {
+  animation: slide-out-right 0.3s ease forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease forwards;
+}
+
+/* Base styles */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: radial-gradient(ellipse at 20% 0%, var(--color-navy) 0%, var(--color-void) 50%);
+    color: var(--color-cream);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+  }
+}
+
+/* Utility classes */
+@layer utilities {
+  .glass {
+    background: var(--color-card-bg);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--color-border);
+  }
+
+  .glass-strong {
+    background: rgba(10, 10, 18, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--color-border);
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, var(--color-gold), #d4b445);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .heading-serif {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .label-caps {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-cream-dim);
+  }
+}

@@ -4,7 +4,70 @@
 
 **Author:** Tyler
 **Date:** November 2025
-**Status:** Draft
+**Status:** In Development
+
+---
+
+## Implementation Status
+
+**Last Updated:** November 26, 2025
+
+### Completed
+
+- [x] FastAPI backend project structure (`backend/`)
+- [x] PostgreSQL database schema (all tables created)
+- [x] Greenhouse scraper (tested, working)
+- [x] Ashby scraper (tested, working)
+- [x] Lever scraper (tested, working)
+- [x] Scrape pipeline with delta detection (new/updated/removed jobs)
+- [x] Job normalization pipeline with OpenAI (gpt-4o-mini)
+- [x] 11 companies seeded and scraped
+- [x] REST API endpoints (companies, jobs, admin)
+- [x] Local development environment working
+
+### Recently Completed
+
+- [x] Weekly synthesis pipeline (company + sector reports with gpt-4o)
+- [x] Company profiles (11 profiles loaded into database)
+- [x] API key auth for admin endpoints
+
+### In Progress
+
+- [x] Frontend (Next.js) - Core pages built, see Phase 3 below for details
+- [ ] Cloud deployment (GCP Cloud Run)
+- [ ] Scheduled jobs (Cloud Scheduler)
+
+### Current Data
+
+| Company | Jobs Scraped |
+|---------|-------------|
+| OpenAI | 453 |
+| Anthropic | 289 |
+| xAI | 260 |
+| Scale AI | 133 |
+| Mistral | 126 |
+| Cohere | 103 |
+| Figure AI | 91 |
+| Perplexity | 65 |
+| Together AI | 48 |
+| Cursor | 30 |
+| Fireworks AI | 27 |
+| **Total** | **~1,625** |
+
+### Running Locally
+
+```bash
+cd backend
+
+# Start server (port 8007)
+source .venv/bin/activate
+uvicorn app.main:app --port 8007 --reload
+
+# Test endpoints
+curl http://localhost:8007/api/companies
+curl -X POST http://localhost:8007/api/admin/scrape/anthropic
+curl -X POST http://localhost:8007/api/admin/normalize?limit=10
+```
 
 ---
 
@@ -76,9 +139,10 @@ A system that:
 - Triggers initial job scrape
 
 **Company Profile**
-- LLM-generated summary: what they do, funding, products, market position, strategic focus
+- Manually created markdown files with company context
+- Includes: what they do, funding, products, market position, strategic focus
 - Used as **baseline context** for detecting anomalies in weekly synthesis
-- Auto-refreshed quarterly (or on-demand)
+- Stored in `profile_markdown` field on company record
 
 ### 6.2 Job Tracking
 
@@ -164,33 +228,67 @@ A system that:
 
 ### 6.4 Dashboard (Frontend)
 
+**Design System: "Observatory"**
+
+Dark, elegant space-themed design evoking a telescope observing AI companies.
+
+**Colors:**
+- Void: `#0a0a12` (darkest background)
+- Deep: `#0d0d1a` (cards, panels)
+- Navy: `#1a1a2e` (secondary bg)
+- Gold: `#c9a227` (accent, highlights, anomalies)
+- Blue: `#4a6fa5` (secondary accent)
+- Cream: `#e8e4dc` (text)
+- CreamMuted: `#9a9aaa` (secondary text)
+
+**Typography:**
+- Headings: "Cormorant Garamond" (serif, italic)
+- Body: "DM Sans" (sans-serif)
+
+**Visual Effects:**
+- Star field background with twinkling animation
+- Glass-morphism cards (backdrop-filter: blur)
+- Slide-in panels with animation
+- Pulsing indicators for anomalies
+
+**Navigation:**
+- Logo: Concentric circles (telescope/eye motif)
+- Tabs: Dashboard, Companies, Digest, Alerts
+- Week indicator: "Week 47, 2025"
+
 **Views:**
 
-1. **Sector Overview (Home)**
-   - This week's sector summary
-   - Aggregate stats: total jobs tracked, net change this week
-   - Trending skills/roles
-   - Notable moves (curated highlights)
+1. **Dashboard (Home)** `/`
+   - Week observation log header
+   - Metric cards: Total Positions, Weekly Delta, Companies Tracked, Anomalies Detected
+   - Companies table: name, positions, week delta, velocity (high/medium/low), focus area tags
+   - Signals panel: Anomalies (gold pulsing dot) and signals (blue)
+   - Weekly Digest: sector-wide trends with company mentions
+   - Click company row → slide-in detail panel
 
-2. **Company List**
-   - All tracked companies
-   - Sortable by: name, total open roles, weekly change, last activity
-   - Quick stats: open roles count, +/- this week
+2. **Company Detail Panel** (slide-in from right)
+   - Company name with "Observation Target" label
+   - Metrics: Open Roles, Week Delta
+   - Valuation (from profile)
+   - Overview text
+   - Hot Roles list
+   - Trend Analysis box
 
-3. **Company Detail**
-   - Company profile
-   - Current open roles (filterable by function, seniority, team)
-   - Weekly reports (scrollable history)
-   - Charts: headcount over time by function, hiring velocity
+3. **Companies** `/companies`
+   - Full company list view
+   - All companies with expanded stats
+   - Filterable/sortable
 
-4. **Job Feed**
-   - Chronological feed of all new/removed jobs
-   - Filterable by company, function, seniority
-   - Useful for "show me all new ML engineer roles this week"
+4. **Digest** `/digest`
+   - Weekly summaries archive
+   - Sector trends over time
+   - Company-specific digests
 
-5. **Alerts (Future)**
+5. **Alerts** `/alerts` (Future)
    - Subscribe to: specific company, role type, keyword
    - Get email/webhook when matching job appears
+
+**Reference:** See `info/frontend-concept/concept.jsx` for full design implementation
 
 ---
 
@@ -672,33 +770,140 @@ For MVP, manually categorize each company and only support Greenhouse/Lever init
 
 ## 12. MVP Scope
 
-### Phase 1: Core Infrastructure (Week 1-2)
+### Phase 1: Core Infrastructure - COMPLETE
 
-- [ ] Database schema + migrations
-- [ ] FastAPI project structure
-- [ ] Greenhouse scraper
-- [ ] Lever scraper
-- [ ] Basic scrape pipeline (manual trigger)
-- [ ] Job normalization pipeline
-- [ ] Add 10 companies (mix of Greenhouse/Lever)
+- [x] Database schema + migrations
+- [x] FastAPI project structure
+- [x] Greenhouse scraper
+- [x] Lever scraper
+- [x] Ashby scraper
+- [x] Basic scrape pipeline (manual trigger)
+- [x] Job normalization pipeline
+- [x] Add 11 companies (Greenhouse/Lever/Ashby)
 
-### Phase 2: Synthesis + API (Week 3)
+### Phase 2: Synthesis + API - COMPLETE
 
-- [ ] Weekly synthesis pipeline
-- [ ] Company summary generation
-- [ ] Sector summary generation
-- [ ] REST API endpoints
-- [ ] Basic auth for admin endpoints
+- [x] Weekly synthesis pipeline
+- [x] Company summary generation
+- [x] Sector summary generation
+- [x] REST API endpoints
+- [x] API key auth for admin endpoints (X-API-Key header)
 
-### Phase 3: Frontend (Week 4)
+### Phase 3: Frontend
 
-- [ ] Next.js project setup
-- [ ] Sector overview page
-- [ ] Company list page
-- [ ] Company detail page
-- [ ] Job feed page
+**Project Structure:**
+- [x] Next.js 15 project setup with TypeScript
+- [x] Tailwind CSS 4 with custom Observatory design system
+- [x] Google Fonts integration (DM Sans + Cormorant Garamond)
+- [x] API client library (`lib/api.ts`)
+- [x] Type definitions (`lib/types.ts`)
+- [x] Reusable component library
 
-### Phase 4: Production Hardening (Week 5)
+**Design System (Observatory):**
+- [x] Dark space-themed color palette (void, deep, navy, gold, blue, cream)
+- [x] Custom typography (DM Sans body, Cormorant Garamond serif headings)
+- [x] Glass-morphism cards with backdrop blur
+- [x] Animated star field background
+- [x] Custom animations (twinkle, pulse-gold, slide-in, fade-in)
+- [x] Responsive layout with consistent spacing
+
+**Core Components:**
+- [x] Navigation bar with active state (`nav.tsx`)
+- [x] Metric cards with optional change indicators (`metric-card.tsx`)
+- [x] Company rows with velocity indicators (`company-row.tsx`)
+- [x] Company detail slide-in panel (`company-detail.tsx`)
+- [x] Alert/signal cards with anomaly highlighting (`alert.tsx`)
+- [x] Animated star field (`star-field.tsx`)
+- [x] Digest entry cards (`digest-entry.tsx`)
+
+**Pages Implemented:**
+
+**1. Dashboard (Home) - `/`** ✅ COMPLETE
+- [x] Week observation header with company count
+- [x] 4 metric cards (Total Positions, Weekly Delta, Companies Tracked, Signals Detected)
+- [x] Trending Roles & In-Demand Skills pills
+- [x] Companies table with sortable columns
+  - [x] Name, Positions, Week Delta, Velocity, Focus Areas
+  - [x] Click to open detail panel
+  - [x] Selected row highlighting
+- [x] Right sidebar with:
+  - [x] LLM-generated sector signals (blue indicators)
+  - [x] Company anomalies (gold pulsing indicators)
+  - [x] Weekly synthesis text from gpt-4o
+- [x] Company detail slide-in panel
+  - [x] Overview tab with company profile, focus areas, notable changes, AI analysis
+  - [x] Jobs tab with filterable job listings
+  - [x] Link to careers page
+- [x] Loading skeleton states
+- [x] Error handling
+
+**2. Companies - `/companies`** ✅ COMPLETE
+- [x] Full company directory grid (3 columns)
+- [x] Company cards showing:
+  - [x] Company name
+  - [x] Open roles count
+  - [x] Weekly change (color-coded green/red)
+  - [x] Velocity indicator with icon
+- [x] Filtering by velocity (All, Growing, Declining, Stable)
+- [x] Sorting options (Open Roles, Weekly Change, Name)
+- [x] Click card to open detail panel
+- [x] Reuses company detail panel component
+- [x] Loading skeleton states
+
+**3. Jobs - `/jobs`** ✅ COMPLETE
+- [x] Comprehensive job directory
+- [x] Search bar (searches title, company, location)
+- [x] Company filter dropdown
+- [x] Function filter dropdown
+- [x] Results count display
+- [x] Two view modes:
+  - [x] Grouped by company (default, shows top 6 jobs per company)
+  - [x] Flat list (when filtering by specific company)
+- [x] Job cards showing:
+  - [x] Normalized title (falls back to raw title)
+  - [x] Company name (in grouped view)
+  - [x] Function, location, team area
+  - [x] External link icon
+  - [x] Hover state with gold border
+- [x] Direct links to job postings (opens in new tab)
+- [x] Loading skeleton states
+
+**4. Digest - `/digest`** ✅ COMPLETE
+- [x] Weekly intelligence report format
+- [x] Week number header
+- [x] Executive Summary section:
+  - [x] Total positions tracked
+  - [x] Net change calculation (added/removed)
+  - [x] Top sector signal
+- [x] Key Metrics Grid:
+  - [x] Expanding companies count with names
+  - [x] Contracting companies count with names
+- [x] Trending Roles section (gold pills)
+- [x] Skills in Demand section (blue pills)
+- [x] Top Movers This Week (ranked by jobs added)
+- [x] Sector Signals list with bullet points
+- [x] Empty state handling
+- [x] Loading skeleton states
+
+**Data Integration:**
+- [x] API client with proper error handling
+- [x] Server-side data fetching (Next.js 15 server components)
+- [x] Client-side interactivity where needed
+- [x] 60-second cache revalidation
+- [x] Loading states with Suspense boundaries
+- [x] Type-safe API responses
+
+**Not Yet Implemented:**
+- [ ] Alerts page (`/alerts`) - Future feature for subscriptions
+- [ ] Historical weekly reports UI (API exists, UI not built yet)
+- [ ] Pagination for jobs (currently loads all)
+- [ ] Advanced filtering (seniority, remote policy, team area)
+- [ ] Job detail modal/page
+- [ ] Company comparison view
+- [ ] Charts and visualizations
+- [ ] Mobile responsive optimizations
+
+### Phase 4: Production Hardening
 
 - [ ] Cloud Scheduler setup
 - [ ] Error alerting
@@ -736,21 +941,23 @@ For MVP, manually categorize each company and only support Greenhouse/Lever init
 
 ## 14. Company List
 
-### Confirmed (ATS Verified)
+### Confirmed & Implemented (11 companies)
 
-| Company | ATS | Identifier | Jobs | Notes |
-|---------|-----|------------|------|-------|
-| OpenAI | Ashby | `openai` | 453 | Frontier models, ChatGPT |
-| Anthropic | Greenhouse | `anthropic` | 289 | Safety-focused, Claude |
-| xAI | Greenhouse | `xai` | 259 | Grok, heavy on AI tutors |
-| Scale AI | Greenhouse | `scaleai` | 133 | Data labeling, RLHF |
-| Mistral | Lever | `mistral` | 126 | Open-source models, EU |
-| Cohere | Ashby | `cohere` | 103 | Enterprise LLMs |
-| Figure AI | Greenhouse | `figureai` | 91 | Humanoid robotics |
-| Perplexity | Ashby | `perplexity` | 65 | AI search |
-| Together AI | Greenhouse | `togetherai` | 48 | Inference platform |
-| Cursor | Ashby | `cursor` | 30 | AI code editor |
-| Fireworks AI | Greenhouse | `fireworksai` | 27 | Inference platform |
+| Company | ATS | Identifier | Jobs | Status |
+|---------|-----|------------|------|--------|
+| OpenAI | Ashby | `openai` | 453 | Scraped |
+| Anthropic | Greenhouse | `anthropic` | 289 | Scraped |
+| xAI | Greenhouse | `xai` | 260 | Scraped |
+| Scale AI | Greenhouse | `scaleai` | 133 | Scraped |
+| Mistral | Lever | `mistral` | 126 | Scraped |
+| Cohere | Ashby | `cohere` | 103 | Scraped |
+| Figure AI | Greenhouse | `figureai` | 91 | Scraped |
+| Perplexity | Ashby | `perplexity` | 65 | Scraped |
+| Together AI | Greenhouse | `togetherai` | 48 | Scraped |
+| Cursor | Ashby | `cursor` | 30 | Scraped |
+| Fireworks AI | Greenhouse | `fireworksai` | 27 | Scraped |
+
+**Total: ~1,625 jobs across 11 companies** (as of Nov 26, 2025)
 
 **Reference:** See `playground/jobscraping/findings/ats-discovery-summary.md` for API details.
 
