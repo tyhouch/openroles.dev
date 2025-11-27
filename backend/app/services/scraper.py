@@ -73,6 +73,11 @@ def run_scrape_for_company(db: Session, company: Company) -> dict:
                 jobs_updated += 1
             else:
                 # Create new job
+                # Use ATS published date for first_seen_at if available,
+                # otherwise fall back to now
+                now = datetime.utcnow()
+                first_seen = raw_job.published_at or now
+
                 job = JobPosting(
                     company_id=company.id,
                     external_id=raw_job.external_id,
@@ -84,8 +89,8 @@ def run_scrape_for_company(db: Session, company: Company) -> dict:
                     job_url=raw_job.job_url,
                     apply_url=raw_job.apply_url,
                     published_at=raw_job.published_at,
-                    first_seen_at=datetime.utcnow(),
-                    last_seen_at=datetime.utcnow(),
+                    first_seen_at=first_seen,
+                    last_seen_at=now,
                 )
                 db.add(job)
                 jobs_added += 1

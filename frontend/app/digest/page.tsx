@@ -2,21 +2,20 @@ import { Suspense } from 'react';
 import { DigestContent } from './digest-content';
 import { StarField } from '@/components/star-field';
 import { Nav } from '@/components/nav';
-import { getCompanies, getSectorSummary, getWeekNumber } from '@/lib/api';
+import { getCompanies, getSectorHistory } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
 
 async function DigestData() {
-  const [companies, sectorSummary] = await Promise.all([
+  const [companies, sectorHistory] = await Promise.all([
     getCompanies(),
-    getSectorSummary().catch(() => null),
+    getSectorHistory(52).catch(() => []),
   ]);
 
   return (
     <DigestContent
       companies={companies}
-      sectorSummary={sectorSummary}
-      weekNumber={getWeekNumber()}
+      sectorHistory={sectorHistory}
     />
   );
 }
