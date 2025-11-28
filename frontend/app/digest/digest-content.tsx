@@ -50,16 +50,16 @@ export function DigestContent({ companies, sectorHistory }: DigestContentProps) 
   const weekLabel = sectorSummary ? formatWeekDate(sectorSummary.week_start) : 'No data';
 
   return (
-    <main className="px-10 py-10 max-w-[900px] mx-auto relative z-10">
+    <main className="px-4 py-6 md:px-10 md:py-10 max-w-[900px] mx-auto relative z-10">
       {/* Header with Week Picker */}
-      <div className="mb-10">
-        <div className="label-caps text-gold mb-3">
-          Week {weekNumber} Intelligence Report
+      <div className="mb-8 md:mb-10">
+        <div className="label-caps text-gold mb-2 md:mb-3">
+          Intelligence Report
         </div>
-        <h1 className="heading-serif text-[36px] text-cream leading-tight mb-3">
+        <h1 className="heading-serif text-2xl md:text-[36px] text-cream leading-tight mb-2 md:mb-3">
           AI Sector Weekly Digest
         </h1>
-        <p className="text-cream-muted text-base leading-relaxed mb-6">
+        <p className="text-cream-muted text-sm md:text-base leading-relaxed mb-4 md:mb-6">
           A synthesis of hiring patterns and signals across the frontier AI landscape.
         </p>
 
@@ -123,7 +123,7 @@ export function DigestContent({ companies, sectorHistory }: DigestContentProps) 
 
       {/* Key Metrics Grid - Only show for current week */}
       {isCurrentWeek && (
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 md:mb-8">
           <div className="glass rounded-xl p-5">
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp size={16} className="text-green-400" />

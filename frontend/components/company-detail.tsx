@@ -92,21 +92,21 @@ export function CompanyDetail({ company, summary, onClose }: CompanyDetailProps)
 
       {/* Panel */}
       <div
-        className={`fixed right-0 top-0 bottom-0 bg-deep border-l border-border z-[9999] flex flex-col transition-all duration-300 ease-out ${
-          isExpanded ? 'w-[800px]' : 'w-[480px]'
+        className={`fixed right-0 top-0 bottom-0 bg-deep border-l border-border z-[9999] flex flex-col transition-all duration-300 ease-out w-full md:w-[480px] ${
+          isExpanded ? 'lg:w-[800px]' : ''
         } ${isVisible ? 'translate-x-0' : 'translate-x-full'}`}
       >
         {/* Header */}
-        <div className="p-6 border-b border-border">
+        <div className="p-4 md:p-6 border-b border-border">
           <div className="flex justify-between items-start mb-4">
             <div>
               <div className="label-caps text-gold mb-2">Observation Target</div>
-              <h2 className="heading-serif text-cream text-[28px]">{company?.name}</h2>
+              <h2 className="heading-serif text-cream text-xl md:text-[28px]">{company?.name}</h2>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-8 h-8 flex items-center justify-center rounded-md border border-border text-cream-muted hover:text-cream hover:border-cream-muted transition-colors"
+                className="hidden lg:flex w-8 h-8 items-center justify-center rounded-md border border-border text-cream-muted hover:text-cream hover:border-cream-muted transition-colors"
                 title={isExpanded ? 'Collapse panel' : 'Expand panel'}
               >
                 {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}

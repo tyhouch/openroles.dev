@@ -54,14 +54,14 @@ export function JobsContent({ jobs, companies }: JobsContentProps) {
   }, [filteredJobs]);
 
   return (
-    <main className="px-10 py-10 max-w-[1400px] mx-auto relative z-10">
+    <main className="px-4 py-6 md:px-10 md:py-10 max-w-[1400px] mx-auto relative z-10">
       {/* Header */}
-      <div className="mb-8">
-        <div className="label-caps text-gold mb-3">Job Directory</div>
-        <h1 className="heading-serif text-[36px] text-cream leading-tight">
+      <div className="mb-6 md:mb-8">
+        <div className="label-caps text-gold mb-2 md:mb-3">Job Directory</div>
+        <h1 className="heading-serif text-2xl md:text-[36px] text-cream leading-tight">
           Open Positions
         </h1>
-        <p className="text-cream-muted text-base mt-3 max-w-xl leading-relaxed">
+        <p className="text-cream-muted text-sm md:text-base mt-2 md:mt-3 max-w-xl leading-relaxed">
           {jobs.length.toLocaleString()} active roles across {companies.length} companies.
         </p>
       </div>
@@ -123,7 +123,7 @@ export function JobsContent({ jobs, companies }: JobsContentProps) {
                   <h2 className="heading-serif text-lg text-cream">{companyName}</h2>
                   <span className="text-cream-muted text-sm">({companyJobs.length})</span>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {companyJobs.slice(0, 6).map(job => (
                     <JobCard key={job.id} job={job} showCompany={false} />
                   ))}
@@ -141,7 +141,7 @@ export function JobsContent({ jobs, companies }: JobsContentProps) {
         </div>
       ) : (
         // Flat list view for single company
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {filteredJobs.map(job => (
             <JobCard key={job.id} job={job} showCompany={false} />
           ))}

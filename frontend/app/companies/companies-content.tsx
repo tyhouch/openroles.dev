@@ -59,22 +59,22 @@ export function CompaniesContent({ companies }: CompaniesContentProps) {
   const totalJobs = companies.reduce((sum, c) => sum + c.job_count, 0);
 
   return (
-    <main className="px-10 py-10 max-w-[1400px] mx-auto relative z-10">
+    <main className="px-4 py-6 md:px-10 md:py-10 max-w-[1400px] mx-auto relative z-10">
       {/* Header */}
-      <div className="mb-8">
-        <div className="label-caps text-gold mb-3">Company Directory</div>
-        <h1 className="heading-serif text-[36px] text-cream leading-tight">
+      <div className="mb-6 md:mb-8">
+        <div className="label-caps text-gold mb-2 md:mb-3">Company Directory</div>
+        <h1 className="heading-serif text-2xl md:text-[36px] text-cream leading-tight">
           Tracked Organizations
         </h1>
-        <p className="text-cream-muted text-base mt-3 max-w-xl leading-relaxed">
+        <p className="text-cream-muted text-sm md:text-base mt-2 md:mt-3 max-w-xl leading-relaxed">
           {companies.length} frontier AI companies under observation.
           {totalJobs.toLocaleString()} total positions tracked.
         </p>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-8">
-        <div className="glass rounded-lg px-4 py-2 flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 md:mb-8">
+        <div className="glass rounded-lg px-3 py-2 flex flex-wrap gap-2">
           <button
             onClick={() => setFilter('all')}
             className={`px-3 py-1 rounded text-sm transition-colors ${
@@ -109,7 +109,7 @@ export function CompaniesContent({ companies }: CompaniesContentProps) {
           </button>
         </div>
 
-        <div className="glass rounded-lg px-4 py-2 flex gap-2 items-center">
+        <div className="glass rounded-lg px-3 py-2 flex gap-2 items-center">
           <span className="text-cream-muted text-sm">Sort:</span>
           <select
             value={sortBy}
@@ -124,7 +124,7 @@ export function CompaniesContent({ companies }: CompaniesContentProps) {
       </div>
 
       {/* Company Grid */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {filteredCompanies.map((company) => {
           const velocity = company.hiring_velocity || 'stable';
           const delta = company.jobs_added_this_week || 0;

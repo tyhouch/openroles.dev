@@ -67,13 +67,13 @@ export function DashboardContent({ companies, sectorSummary }: DashboardContentP
   const visibleSkills = showAllSkills ? allSkills : allSkills.slice(0, 10);
 
   return (
-    <main className="px-10 py-10 max-w-[1400px] mx-auto relative z-10">
+    <main className="px-4 py-6 md:px-10 md:py-10 max-w-[1400px] mx-auto relative z-10">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="heading-serif text-[42px] text-cream leading-tight">
+      <div className="mb-6 md:mb-8">
+        <h1 className="heading-serif text-2xl md:text-[42px] text-cream leading-tight">
           AI Sector Intelligence
         </h1>
-        <p className="text-cream-muted text-base mt-3 max-w-2xl leading-relaxed">
+        <p className="text-cream-muted text-sm md:text-base mt-2 md:mt-3 max-w-2xl leading-relaxed">
           Tracking hiring patterns across {companies.length} frontier AI companies.{' '}
           <span className="text-cream">{totalJobs.toLocaleString()}</span> active positions
           {weeklyDelta !== 0 && (
@@ -113,11 +113,11 @@ export function DashboardContent({ companies, sectorSummary }: DashboardContentP
 
       {/* Tab Content */}
       {activeTab === 'intelligence' ? (
-        <div className="grid grid-cols-[1fr_380px] gap-10">
+        <div className="flex flex-col lg:grid lg:grid-cols-[1fr_380px] gap-6 lg:gap-10">
           {/* Companies table */}
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="heading-serif text-xl text-cream">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
+              <h2 className="heading-serif text-lg md:text-xl text-cream">
                 Active Observations{' '}
                 <span className="text-cream-muted font-normal">
                   (Week of {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})
@@ -147,9 +147,9 @@ export function DashboardContent({ companies, sectorSummary }: DashboardContentP
             </div>
           </div>
 
-          {/* Right column: Signals */}
-          <div>
-            <h2 className="heading-serif text-xl text-cream mb-4">
+          {/* Right column: Signals - on mobile, show above table */}
+          <div className="order-first lg:order-none">
+            <h2 className="heading-serif text-lg md:text-xl text-cream mb-4">
               Sector Signals
             </h2>
             <div className="flex flex-col gap-3">
@@ -196,7 +196,7 @@ export function DashboardContent({ companies, sectorSummary }: DashboardContentP
           {/* Trending Roles & In-Demand Skills */}
           {(allRoles.length > 0 || allSkills.length > 0) && (
             <div className="glass rounded-xl p-6">
-              <div className="grid grid-cols-2 gap-8">
+              <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8">
                 {allRoles.length > 0 && (
                   <div>
                     <div className="label-caps text-gold mb-4">Trending Roles</div>
