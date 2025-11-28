@@ -1,3 +1,10 @@
+# Project folders
 playground/
 claudes-testing-workspace/
 deployment_scripts/
+
+# OS files
+.DS_Store
+
+# Process IDs
+*.pid
