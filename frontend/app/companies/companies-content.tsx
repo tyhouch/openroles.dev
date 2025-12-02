@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { ArrowUpRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { CompanyDetail } from '@/components/company-detail';
-import { getCompany, getCompanySummary } from '@/lib/api';
+import { Sparkline, WeeklyChange } from '@/components/sparkline';
+import { getCompany, getCompanySummary, getCompanySummaryHistory } from '@/lib/api';
 import type { Company, CompanyDetail as CompanyDetailType, CompanySummary, SectorSummary } from '@/lib/types';
 
 interface CompaniesContentProps {
@@ -12,6 +13,9 @@ interface CompaniesContentProps {
 }
 
 type VelocityFilter = 'all' | 'up' | 'down' | 'stable';
+
+// History data for sparklines
+type CompanyHistoryMap = Record<string, number[]>;
 
 function VelocityIcon({ velocity }: { velocity: 'up' | 'down' | 'stable' }) {
   if (velocity === 'up') return <TrendingUp size={14} className="text-green-400" />;
@@ -25,6 +29,33 @@ export function CompaniesContent({ companies }: CompaniesContentProps) {
   const [companySummary, setCompanySummary] = useState<CompanySummary | null>(null);
   const [filter, setFilter] = useState<VelocityFilter>('all');
   const [sortBy, setSortBy] = useState<'jobs' | 'delta' | 'name'>('jobs');
+  const [historyData, setHistoryData] = useState<CompanyHistoryMap>({});
+
+  // Fetch history for all companies on mount (for sparklines)
+  useEffect(() => {
+    async function fetchAllHistory() {
+      const historyMap: CompanyHistoryMap = {};
+
+      await Promise.all(
+        companies.map(async (company) => {
+          try {
+            const history = await getCompanySummaryHistory(company.slug, 4);
+            // Convert to net changes array, oldest first
+            const netChanges = history
+              .map((s) => (s.jobs_added_count || 0) - (s.jobs_removed_count || 0))
+              .reverse();
+            historyMap[company.slug] = netChanges;
+          } catch {
+            historyMap[company.slug] = [];
+          }
+        })
+      );
+
+      setHistoryData(historyMap);
+    }
+
+    fetchAllHistory();
+  }, [companies]);
 
   useEffect(() => {
     if (!selectedSlug) {
@@ -127,7 +158,9 @@ export function CompaniesContent({ companies }: CompaniesContentProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {filteredCompanies.map((company) => {
           const velocity = company.hiring_velocity || 'stable';
-          const delta = company.jobs_added_this_week || 0;
+          const added = company.jobs_added_this_week || 0;
+          const removed = company.jobs_removed_this_week || 0;
+          const sparklineData = historyData[company.slug] || [];
 
           return (
             <div
@@ -148,18 +181,20 @@ export function CompaniesContent({ companies }: CompaniesContentProps) {
                   <div className="text-cream-dim text-xs">Open Roles</div>
                 </div>
                 <div>
-                  <div className={`text-2xl font-medium ${delta > 0 ? 'text-green-400' : delta < 0 ? 'text-red-400' : 'text-cream-muted'}`}>
-                    {delta > 0 ? `+${delta}` : delta}
-                  </div>
-                  <div className="text-cream-dim text-xs">This Week</div>
+                  <WeeklyChange added={added} removed={removed} />
+                  <div className="text-cream-dim text-xs mt-1">This Week</div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <VelocityIcon velocity={velocity} />
-                <span className="text-cream-muted text-sm capitalize">
-                  {velocity === 'up' ? 'Hiring velocity up' : velocity === 'down' ? 'Hiring slowing' : 'Stable hiring'}
-                </span>
+              {/* Sparkline trend */}
+              <div className="flex items-center gap-3 pt-3 border-t border-border">
+                <Sparkline data={sparklineData} height={20} barWidth={6} gap={2} />
+                <div className="flex items-center gap-1.5">
+                  <VelocityIcon velocity={velocity} />
+                  <span className="text-cream-dim text-xs">
+                    {sparklineData.length > 0 ? `${sparklineData.length}w trend` : 'No history'}
+                  </span>
+                </div>
               </div>
             </div>
           );

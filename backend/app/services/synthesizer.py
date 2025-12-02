@@ -466,12 +466,17 @@ def run_weekly_synthesis(db: Session, week_start: date | None = None) -> dict:
 
     Args:
         db: Database session
-        week_start: Monday of week to analyze (defaults to current week)
+        week_start: Monday of week to analyze (defaults to PREVIOUS week, since
+                    this typically runs Monday morning after the week ends)
 
     Returns:
         Dict with results for all companies and sector
     """
-    week_start = get_week_start(week_start)
+    if week_start is None:
+        # Default to previous week - when run Monday morning, analyze the week that just ended
+        week_start = get_week_start() - timedelta(days=7)
+    else:
+        week_start = get_week_start(week_start)
 
     results = {
         "week_start": week_start.isoformat(),

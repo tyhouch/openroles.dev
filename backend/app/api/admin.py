@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -145,9 +145,18 @@ def trigger_full_synthesis(
     force: bool = Query(default=False, description="Force regenerate even if exists"),
     db: Session = Depends(get_db),
 ):
-    """Run full weekly synthesis - all companies then sector."""
-    if force:
+    """Run full weekly synthesis - all companies then sector.
+
+    When week is not specified, analyzes the PREVIOUS week (since this typically
+    runs Monday morning after the week ends).
+    """
+    # Calculate the target week - same logic as run_weekly_synthesis
+    if week is None:
+        week_start = get_week_start() - timedelta(days=7)  # Previous week
+    else:
         week_start = get_week_start(week)
+
+    if force:
         # Delete existing summaries for this week
         db.query(CompanyWeeklySummary).filter(
             CompanyWeeklySummary.week_start == week_start
@@ -157,7 +166,7 @@ def trigger_full_synthesis(
         ).delete()
         db.commit()
 
-    result = run_weekly_synthesis(db, week)
+    result = run_weekly_synthesis(db, week_start)
     return result
 
 
