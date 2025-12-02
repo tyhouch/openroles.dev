@@ -8,3 +8,4 @@ deployment_scripts/
 
 # Process IDs
 *.pid
+*.db

@@ -34,7 +34,7 @@ if os.getenv("ENVIRONMENT") == "production":
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_origin_regex=r"https://openroles-.*\.vercel\.app",  # Vercel preview deployments
+    allow_origin_regex=r"https://.*\.vercel\.app",  # All Vercel deployments
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

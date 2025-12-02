@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, BarChart3, FileText } from 'lucide-react';
-import { MetricCard } from '@/components/metric-card';
 import { CompanyRow, CompanyRowHeader } from '@/components/company-row';
 import { Alert } from '@/components/alert';
 import { CompanyDetail } from '@/components/company-detail';
-import { getCompany, getCompanySummary } from '@/lib/api';
+import { getCompany, getCompanySummary, getCompanySummaryHistory } from '@/lib/api';
 import type { Company, CompanyDetail as CompanyDetailType, CompanySummary, SectorSummary } from '@/lib/types';
 import { mapHiringVelocity } from '@/lib/types';
+
+type CompanyHistoryMap = Record<string, number[]>;
 
 interface DashboardContentProps {
   companies: Company[];
@@ -22,6 +23,32 @@ export function DashboardContent({ companies, sectorSummary }: DashboardContentP
   const [activeTab, setActiveTab] = useState<'intelligence' | 'report'>('intelligence');
   const [showAllRoles, setShowAllRoles] = useState(false);
   const [showAllSkills, setShowAllSkills] = useState(false);
+  const [historyData, setHistoryData] = useState<CompanyHistoryMap>({});
+
+  // Fetch history for all companies on mount (for sparklines)
+  useEffect(() => {
+    async function fetchAllHistory() {
+      const historyMap: CompanyHistoryMap = {};
+
+      await Promise.all(
+        companies.map(async (company) => {
+          try {
+            const history = await getCompanySummaryHistory(company.slug, 4);
+            const netChanges = history
+              .map((s) => (s.jobs_added_count || 0) - (s.jobs_removed_count || 0))
+              .reverse();
+            historyMap[company.slug] = netChanges;
+          } catch {
+            historyMap[company.slug] = [];
+          }
+        })
+      );
+
+      setHistoryData(historyMap);
+    }
+
+    fetchAllHistory();
+  }, [companies]);
 
   // Calculate totals
   const totalJobs = companies.reduce((sum, c) => sum + c.job_count, 0);
@@ -137,9 +164,11 @@ export function DashboardContent({ companies, sectorSummary }: DashboardContentP
                     key={company.slug}
                     company={company.name}
                     jobs={company.job_count}
-                    change={company.jobs_added_this_week || 0}
+                    added={company.jobs_added_this_week || 0}
+                    removed={company.jobs_removed_this_week || 0}
                     velocity={mapHiringVelocity(company.hiring_velocity)}
                     focus={company.focus_areas || []}
+                    sparklineData={historyData[company.slug] || []}
                     selected={selectedSlug === company.slug}
                     onClick={() => setSelectedSlug(company.slug)}
                   />

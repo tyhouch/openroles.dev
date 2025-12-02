@@ -1,13 +1,16 @@
 'use client';
 
 import type { VelocityLevel } from '@/lib/types';
+import { Sparkline } from '@/components/sparkline';
 
 interface CompanyRowProps {
   company: string;
   jobs: number;
-  change: number;
+  added: number;
+  removed: number;
   velocity: VelocityLevel;
   focus: string[];
+  sparklineData?: number[];
   selected?: boolean;
   onClick?: () => void;
 }
@@ -15,48 +18,48 @@ interface CompanyRowProps {
 export function CompanyRow({
   company,
   jobs,
-  change,
+  added,
+  removed,
   velocity,
   focus,
+  sparklineData = [],
   selected,
   onClick,
 }: CompanyRowProps) {
+  const net = added - removed;
+
   return (
     <>
       {/* Desktop row */}
       <div
         onClick={onClick}
-        className={`hidden md:grid grid-cols-[180px_100px_100px_120px_1fr] items-center px-5 py-4 border-b border-border cursor-pointer transition-colors ${
+        className={`hidden md:grid grid-cols-[160px_80px_80px_100px_1fr] items-center px-5 py-4 border-b border-border cursor-pointer transition-colors ${
           selected ? 'bg-gold-muted' : 'hover:bg-navy/50'
         }`}
       >
         <span className="text-cream text-sm font-medium">{company}</span>
         <span className="text-cream text-sm font-mono">{jobs}</span>
-        <span
-          className={`text-[13px] font-mono ${
-            change > 0
-              ? 'text-success'
-              : change < 0
-              ? 'text-danger'
-              : 'text-cream-dim'
-          }`}
-        >
-          {change > 0 ? '+' : ''}
-          {change}
-        </span>
-        <span
-          className={`text-[11px] tracking-wider uppercase ${
-            velocity === 'high'
-              ? 'text-gold'
-              : velocity === 'medium'
-              ? 'text-blue'
-              : 'text-cream-dim'
-          }`}
-        >
-          {velocity}
-        </span>
+        <div className="flex flex-col">
+          <span
+            className={`text-[13px] font-mono ${
+              net > 0
+                ? 'text-success'
+                : net < 0
+                ? 'text-danger'
+                : 'text-cream-dim'
+            }`}
+          >
+            {net > 0 ? '+' : ''}{net}
+          </span>
+          <span className="text-cream-dim text-[10px]">
+            +{added}/-{removed}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Sparkline data={sparklineData} height={18} barWidth={5} gap={1} />
+        </div>
         <div className="flex gap-2 flex-wrap">
-          {focus.map((tag) => (
+          {focus.slice(0, 2).map((tag) => (
             <span
               key={tag}
               className="bg-blue-muted text-cream text-[11px] px-2 py-1 rounded"
@@ -64,6 +67,9 @@ export function CompanyRow({
               {tag}
             </span>
           ))}
+          {focus.length > 2 && (
+            <span className="text-cream-dim text-[10px]">+{focus.length - 2}</span>
+          )}
         </div>
       </div>
 
@@ -76,17 +82,7 @@ export function CompanyRow({
       >
         <div className="flex justify-between items-start mb-2">
           <span className="text-cream text-sm font-medium">{company}</span>
-          <span
-            className={`text-[11px] tracking-wider uppercase ${
-              velocity === 'high'
-                ? 'text-gold'
-                : velocity === 'medium'
-                ? 'text-blue'
-                : 'text-cream-dim'
-            }`}
-          >
-            {velocity}
-          </span>
+          <Sparkline data={sparklineData} height={16} barWidth={4} gap={1} />
         </div>
         <div className="flex items-center gap-4 text-sm mb-2">
           <span className="text-cream-muted">
@@ -94,15 +90,15 @@ export function CompanyRow({
           </span>
           <span
             className={`font-mono ${
-              change > 0
+              net > 0
                 ? 'text-success'
-                : change < 0
+                : net < 0
                 ? 'text-danger'
                 : 'text-cream-dim'
             }`}
           >
-            {change > 0 ? '+' : ''}
-            {change} this week
+            {net > 0 ? '+' : ''}{net}
+            <span className="text-cream-dim text-xs ml-1">(+{added}/-{removed})</span>
           </span>
         </div>
         {focus.length > 0 && (
@@ -127,11 +123,11 @@ export function CompanyRow({
 
 export function CompanyRowHeader() {
   return (
-    <div className="hidden md:grid grid-cols-[180px_100px_100px_120px_1fr] px-5 py-3 border-b border-border label-caps">
+    <div className="hidden md:grid grid-cols-[160px_80px_80px_100px_1fr] px-5 py-3 border-b border-border label-caps">
       <span>Company</span>
-      <span>Positions</span>
-      <span>Week Delta</span>
-      <span>Velocity</span>
+      <span>Roles</span>
+      <span>Delta</span>
+      <span>Trend</span>
       <span>Focus Areas</span>
     </div>
   );
